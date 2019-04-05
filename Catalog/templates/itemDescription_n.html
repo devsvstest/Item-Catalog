@@ -1,0 +1,30 @@
+<html>
+<head>
+        <h1>
+            <a href={{ url_for('displayCatalog') }} style="font-size: 1.8em"> Item Catalog</a>
+            <a href={{ url_for('login') }} style="float:right; font-size: .5em"  >
+                    {{ "Click here to login" }}
+            </a>
+        </h1>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = stylesheet type=text/css href="{{url_for('static', filename='styles11.css') }}">
+</head>
+
+
+<body>
+
+    <center>
+
+    <div style=" margin: 0 auto; "> 
+
+        <h2> {{ item.title }} </h2>
+        
+        <p> {{ item.description }} </p>
+
+    </div>
+    </center>
+
+
+</body>
+</html>
+

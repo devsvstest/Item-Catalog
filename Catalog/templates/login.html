@@ -1,0 +1,92 @@
+<html>
+<head>
+    <title>Item Catalog</title>
+    <h1>
+    
+        <a href={{ url_for('displayCatalog') }} style="font-size: 1.8em"> Item Catalog</a>
+        
+    </h1>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel = stylesheet type=text/css href="{{url_for('static', filename='styles11.css') }}">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+    <script>
+    function start() {
+        gapi.load('auth2', function() {
+        auth2 = gapi.auth2.init({
+            client_id: '657068284478-53ksfv5b3glrqcatsotjr684p6ai95ej.apps.googleusercontent.com'
+        });
+        });
+    }
+    </script>
+</head>
+
+<body>
+
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v3.2&appId=788534038198843"></script>
+
+    <div class="fb-login-button" data-width="200" data-size="large" data-button-type="login_with" data-auto-logout-link="false" data-use-continue-as="false"></div>
+    <script>
+        window.fbAsyncInit = function() {
+          FB.init({
+            appId      : '788534038198843',
+            cookie     : true,
+            xfbml      : true,
+            version    : 'v3.2'
+          });
+            
+          FB.AppEvents.logPageView();   
+            
+        };
+      
+        (function(d, s, id){
+           var js, fjs = d.getElementsByTagName(s)[0];
+           if (d.getElementById(id)) {return;}
+           js = d.createElement(s); js.id = id;
+           js.src = "https://connect.facebook.net/en_US/sdk.js";
+           fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+    <button id="signinButton">Google Signin</button>
+    <div id="result"></div>
+
+    <script>
+            $('#signinButton').click(function() {
+                function signInCallback(authResult){
+                    if (authResult['code']){
+                        $('#signinButton').attr('style', 'display: none');
+                        $.ajax({
+                            type: 'POST',
+                            url: '/gconnect?state={{STATE}}',
+                            headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        contentType: 'application/octet-stream; charset=utf-8',
+                        success:function(result){
+                            $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                                setTimeout(function() {
+                                window.location.href = "/catalog/";
+                                }, 4000);
+                        },
+                        processData:false,
+                        data:authResult['code']
+                        });
+                    } 
+                    else{
+                        // handle error
+                        console.log('There was an error: ' + authResult['error']);
+                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                    }
+                }
+                /*console.log('There was an error: ') */
+                auth2.grantOfflineAccess().then(signInCallback);
+            });
+    </script>
+
+</body>
+</html>
+
+

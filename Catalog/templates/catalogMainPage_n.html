@@ -1,0 +1,45 @@
+<html>
+<head>
+    <h1>
+        <a href={{ url_for('displayCatalog') }} style="font-size: 1.8em"> Item Catalog</a>
+        <a href={{ url_for('login') }} style="float:right; font-size: .5em"  >
+                {{ "Click here to login" }}
+        </a>
+    </h1>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel = stylesheet type=text/css href="{{url_for('static', filename='styles11.css') }}">
+</head>
+
+<body>
+
+<div style="width: 100%;">
+    <div style=" float:left; width: 30%;">
+
+        <h2>{{ "Categories" }}</h2>
+        {% for i in items %}
+            <p>
+                <a href={{ url_for('displayCategoryItems', category_name = i.category) }}>
+                    {{i.category}}
+                </a>
+            </p>
+        {% endfor %}
+
+    </div>
+    <div style=" float:right; width: 70%;" id ="div2">
+
+        <h2>{{ "Recently added Items" }}</h2>
+        {% for i in latestItems %}
+            <p>
+                <a href={{ url_for('itemDescription', category_name = i.category, item = i.title) }}>
+                    {{i.title}}
+                </a>
+            </p>
+        {% endfor %}
+
+    </div>
+</div>
+<div style="clear:both"></div>
+
+</body>
+
+</html>

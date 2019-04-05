@@ -1,0 +1,43 @@
+<html>
+<head>
+        <title>Item Catalog</title>
+        <h1>
+                <center>
+                <table border="0" cellpadding="15">
+                        <tr>
+                        <td><a href={{ url_for('displayCatalog') }} style="font-size: 4.0em"> Item Catalog </a></td>
+                        <td><img src= {{ img_src }} style = "width: 50px; height: 50px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"></img></td>
+                        <td> Welcome, <strong>{{ username }}</strong><br>Email: {{ email }} <br>
+                                <a href={{ url_for('gdisconnect') }} > {{ "Logout" }} </a> </td>
+                        </tr>
+                </table>
+                </center>
+        </h1>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = stylesheet type=text/css href="{{url_for('static', filename='styles11.css') }}">
+</head>
+
+
+<body>
+
+        <form method = post >
+                Title<br>
+                <input type="text" name="itemName" value= {{ item.title }} >
+                <br>
+                Description<br>
+                <input type="text" name="itemDescription" value= {{ item.description }} >
+                <br>
+                Category<br>
+                <input type="text" name="itemCategory" value= {{ item.category }} >
+                <br>
+                <br><br>
+                <input type="submit" value="Submit">
+        </form> 
+        
+        <form action="{{ url_for('itemDescription', category_name = item.category, item = item.title) }}" method=get>
+                <div><button id="cancel" type="submit">Cancel</button></div>
+        </form>
+
+</body>
+</html>
+

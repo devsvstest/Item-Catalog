@@ -1,0 +1,44 @@
+<html>
+<head>
+    <title>Item Catalog</title>
+    <h1>
+        <center>
+            <table border="0" cellpadding="15">
+                <tr>
+                    <td><a href={{ url_for('displayCatalog') }} style="font-size: 4.0em"> Item Catalog </a></td>
+                    <td><img src= {{ img_src }} style = "width: 50px; height: 50px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"></img></td>
+                    <td> Welcome, <strong>{{ username }}</strong><br>Email: {{ email }} <br>
+                        <a href={{ url_for('gdisconnect') }} > {{ "Logout" }} </a> </td>
+                </tr>
+            </table>
+        </center>
+    </h1>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel = stylesheet type=text/css href="{{url_for('static', filename='styles11.css') }}">
+</head>
+
+
+<body>
+
+    <center>
+
+    <div style=" margin: 0 auto; "> 
+
+        <h2> {{ item.title }} </h2>
+        
+        <p> {{ item.description }} </p>
+
+        <div style=" width: 100% " >
+            <a href={{ url_for('editItem', item = item.title ) }}> Edit </a>
+            <br>
+            <br>
+            <a href={{ url_for('deleteItem', item = item.title ) }}> Delete </a>
+        </div>
+
+    </div>
+    </center>
+
+
+</body>
+</html>
+
