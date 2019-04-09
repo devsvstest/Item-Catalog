@@ -6,6 +6,7 @@ import json
 import httplib2
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
+from oauth2client.client import OAuth2Credentials
 from flask import session as login_session
 import random
 import string
@@ -14,8 +15,6 @@ import requests
 app = Flask(__name__)
 
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
-#APPLICATION_NAME = "Web client localhost"
-
 
 engine = create_engine('sqlite:///itemcatalog.db')
 Base.metadata.bind=engine
@@ -31,6 +30,7 @@ def login():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    print (request.args.get('state'))
     # Validate state token
     if request.args.get('state') != login_session['state']:
         print ("login state not matched")
@@ -46,6 +46,7 @@ def gconnect():
         # Upgrade the authorization code into a credentials object
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
+        #oauth_flow.access_type = 'offline'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
         response = make_response(
@@ -53,6 +54,24 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
+    print ( "Access Token %s" ) % credentials.access_token 
+    print ( "Client Id %s" ) % credentials.client_id 
+    print ( "Client Secret %s" ) % credentials.client_secret 
+    print ( "Refresh Token %s" ) % credentials.refresh_token 
+    print ( "Token Expiry %s" ) % credentials.token_expiry
+    print ( "Token uri %s") % credentials.token_uri
+    print ( "User agent %s") % credentials.user_agent
+    print ( "Revoke uri %s") % credentials.revoke_uri
+    print ( "ID Token %s") % credentials.id_token
+    print ("\n")
+
+    login_session['client_id'] = credentials.client_id  
+    login_session['client_secret'] = credentials.client_secret
+    login_session['refresh_token'] = credentials.refresh_token
+    login_session['token_expiry'] = credentials.token_expiry
+    login_session['token_uri'] = credentials.token_uri
+    login_session['user_agent'] = credentials.user_agent
+    
     # Check that the access token is valid.
     access_token = credentials.access_token
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
@@ -103,6 +122,7 @@ def gconnect():
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
+    login_session['provider'] = 'google'
 
     print( login_session['username'] )
     print(login_session['picture'] )
@@ -113,11 +133,102 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 100px; height: 100px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print ("done!")
     return output
 
+@app.route('/fbconnect', methods=['POST'])
+def fbconnect():
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state parameter.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    access_token = request.data
+    print ("access token received %s ") % access_token
+
+
+    app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
+        'web']['app_id']
+    app_secret = json.loads(
+        open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
+        app_id, app_secret, access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+
+
+    # Use token to get user info from API
+    token = result.split(',')[0].split(':')[1].replace('"', '')
+
+    url = 'https://graph.facebook.com/v2.8/me?access_token=%s&fields=name,id,email' % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    # print "url sent for API access:%s"% url
+    # print "API JSON result: %s" % result
+    data = json.loads(result)
+    print ("\n")
+    print (data)
+    print ("\n")
+    login_session['provider'] = 'facebook'
+    login_session['username'] = data["name"]
+    login_session['email'] = data["email"]
+    login_session['facebook_id'] = data["id"]
+
+    # The token must be stored in the login_session in order to properly logout
+    login_session['access_token'] = token
+
+    # Get user picture
+    url = 'https://graph.facebook.com/v2.8/me/picture?access_token=%s&redirect=0&height=200&width=200' % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    data = json.loads(result)
+
+    login_session['picture'] = data["data"]["url"]
+
+    # see if user exists
+    user_id = login_session['email']
+    
+    login_session['user_id'] = user_id
+
+    output = ''
+    output += '<h1>Welcome, '
+    output += login_session['username']
+
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += ' " style = "width: 100px; height: 100px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+
+    flash("Now logged in as %s" % login_session['username'])
+    return output
+
+@app.route('/fbdisconnect/')
+def fbdisconnect():
+    facebook_id = login_session['facebook_id']
+    # The access token must me included to successfully logout
+    access_token = login_session['access_token']
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id, access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'DELETE')[1]
+    data = json.loads(result)
+    
+    del login_session['provider']
+    del login_session['username']
+    del login_session['email']
+    del login_session['facebook_id']
+
+    try:
+        if data["success"] is not None:
+            response = make_response(json.dumps('Successfully disconnected.'), 302)
+            response.headers['Content-Type'] = 'application/json'
+            response.headers['Location'] = '/'
+            return response
+    except KeyError:
+        response = make_response(json.dumps('Failed to revoke token for given user.'), 400)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    
 @app.route('/gdisconnect/')
 def gdisconnect():
     access_token = login_session.get('access_token')
@@ -126,6 +237,16 @@ def gdisconnect():
         response = make_response(json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
+
+    obj = OAuth2Credentials(access_token, login_session['client_id'], login_session['client_secret'],
+                            login_session['refresh_token'], login_session['token_expiry'], 
+                            login_session['token_uri'], None)
+
+    obj.refresh(httplib2.Http())
+
+    access_token = obj.access_token
+    login_session['access_token'] = access_token
+
     print ('In gdisconnect access token is %s', access_token )
     print ('User name is: ')
     print (login_session['username'])
@@ -149,14 +270,21 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
+
+@app.route('/disconnect/')
+def disconnect():
+    if login_session['provider'] == 'google':
+        return gdisconnect()
+    elif login_session['provider'] == 'facebook':
+        return fbdisconnect()
+
+
 @app.route('/')
 @app.route('/catalog/')
 def displayCatalog():
 
     DBSession = sessionmaker(bind = engine)
     session = DBSession()
-
-    #print (str(login_session['picture']))
 
     items = session.query(Catalog.category).group_by(Catalog.category).all()
     latestItems = session.query(Catalog).order_by(Catalog.created_datetime).limit(10).all()

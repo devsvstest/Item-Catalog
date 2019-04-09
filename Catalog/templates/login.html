@@ -15,7 +15,7 @@
     function start() {
         gapi.load('auth2', function() {
         auth2 = gapi.auth2.init({
-            client_id: '657068284478-53ksfv5b3glrqcatsotjr684p6ai95ej.apps.googleusercontent.com'
+            client_id: '657068284478-fc3jsib4g4hr6i42h74heq2m88lis7v1.apps.googleusercontent.com'
         });
         });
     }
@@ -24,34 +24,19 @@
 
 <body>
 
-    <div id="fb-root"></div>
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v3.2&appId=788534038198843"></script>
-
-    <div class="fb-login-button" data-width="200" data-size="large" data-button-type="login_with" data-auto-logout-link="false" data-use-continue-as="false"></div>
-    <script>
-        window.fbAsyncInit = function() {
-          FB.init({
-            appId      : '788534038198843',
-            cookie     : true,
-            xfbml      : true,
-            version    : 'v3.2'
-          });
-            
-          FB.AppEvents.logPageView();   
-            
-        };
-      
-        (function(d, s, id){
-           var js, fjs = d.getElementsByTagName(s)[0];
-           if (d.getElementById(id)) {return;}
-           js = d.createElement(s); js.id = id;
-           js.src = "https://connect.facebook.net/en_US/sdk.js";
-           fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
-    </script>
-
-    <button id="signinButton">Google Signin</button>
-    <div id="result"></div>
+    <center>
+        <div>
+            <br><br><br><br><br><br><br><br>
+            <button id="signinButton">Google Signin</button>
+                <br>
+            <button>
+                <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
+                    <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
+                </fb:login-button>
+            </button>              
+            <div id="result"></div>
+        </div>
+    </center>
 
     <script>
             $('#signinButton').click(function() {
@@ -69,7 +54,7 @@
                             $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
                                 setTimeout(function() {
                                 window.location.href = "/catalog/";
-                                }, 4000);
+                                }, 1000);
                         },
                         processData:false,
                         data:authResult['code']
@@ -84,6 +69,59 @@
                 /*console.log('There was an error: ') */
                 auth2.grantOfflineAccess().then(signInCallback);
             });
+    </script>
+
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+            appId      : '1036564369871511',
+            cookie     : true,  // enable cookies to allow the server to access 
+                                // the session
+            xfbml      : true,  // parse social plugins on this page
+            version    : 'v3.2' // use version 2.2
+            });
+        };
+        // Load the SDK asynchronously
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+        // Here we run a very simple test of the Graph API after login is
+        // successful.  See statusChangeCallback() for when this call is made.
+        function sendTokenToServer() {
+
+            var access_token = FB.getAuthResponse()['accessToken'];
+            console.log(access_token)
+            console.log('Welcome!  Fetching your information.... ');
+
+            FB.api('/me', function(response) {
+
+                console.log('Successful login for: ' + response.name);
+                $.ajax({
+                    type: 'POST',
+                    url: '/fbconnect?state={{STATE}}',
+                    processData: false,
+                    data: access_token,
+                    contentType: 'application/octet-stream; charset=utf-8',
+                    success: function(result) {
+                        // Handle or verify the server response if necessary.
+                        if (result) {
+                            $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                            setTimeout(function() {
+                                window.location.href = "/catalog";
+                            }, 4000);
+                        } else {
+                            $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                        }
+                    } 
+                });
+
+            });
+
+        }
     </script>
 
 </body>
