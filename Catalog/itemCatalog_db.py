@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Item Catalog
+
 import os
 import sys
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
