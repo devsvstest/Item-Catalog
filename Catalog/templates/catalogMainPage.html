@@ -2,18 +2,31 @@
 <head>
     <title>Item Catalog</title>
     <h1>
-        <center>
-            <table border="0" cellpadding="15">
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td><a href={{ url_for('displayCatalog') }} style="font-size: 4.0em"> Item Catalog </a></td>
-                    <td><img src= {{ img_src }} style = "width: 50px; height: 50px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"></img></td>
-                    <td> Welcome, <strong>{{ username }}</strong><br>Email: {{ email }} <br>
-                     <a href={{ url_for('disconnect') }} > {{ "Logout" }} </a> </td>
-                </tr>
-            </table>
-        </center>
+        <table border="0" cellpadding="15">     
+            <tr>
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> 
+                <td><a href={{ url_for('displayCatalog') }} style="font-size: 4.0em"> Item Catalog </a></td>
+                <td><img src= {{ img_src }} style = "width: 50px; height: 50px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"></img></td>
+                <td> Welcome, <strong>{{ username }}</strong><br>Email: {{ email }} <br></td>
+            
+                <td></td><td></td><td></td>
+                <td></td>
+                <td >
+                    <table border="0" cellpadding="5" style = "float: right">
+                            <tr>
+                                <td>
+                                    <a href={{ url_for('disconnect') }} style="  font-size: 1.2em">{{ "Logout" }}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href={{ url_for('catalogJSON') }} style=" font-size: .8em"> JSON </a>
+                                </td>
+                            </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>   
     </h1>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel = stylesheet type=text/css href="{{url_for('static', filename='styles11.css') }}">

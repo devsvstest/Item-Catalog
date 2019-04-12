@@ -2,9 +2,20 @@
 <head>
     <h1>
         <a href={{ url_for('displayCatalog') }} style="font-size: 1.8em"> Item Catalog</a>
-        <a href={{ url_for('login') }} style="float:right; font-size: .5em"  >
-                {{ "Click here to login" }}
-        </a>
+        
+        <table border="0" cellpadding="15" style = "float: right">
+                <tr>
+                    <td>
+                        <a href={{ url_for('login') }} style="  font-size: 1.2em">{{ "Login" }}</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href={{ url_for('catalogJSON') }} style=" font-size: .8em"> JSON </a>
+                    </td>
+                </tr>
+        </table>
+        
     </h1>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel = stylesheet type=text/css href="{{url_for('static', filename='styles11.css') }}">
