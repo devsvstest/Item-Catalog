@@ -95,3 +95,14 @@ Configurations
 * Execute lotsofitems.py to populate the database
 * Test the functionality of the app
 
+
+Third party resources used
+---------------------------
+
+
+* https://www.google.com/url?sa=t&source=web&rct=j&url=https://developers.google.com/web/tools/chrome-devtools/javascript/&ved=2ahUKEwji8-Sd-LXhAhVo4HMBHWmTDJ4QFjAKegQIAhAB&usg=AOvVaw3KRhdCV8FhEFVVTxc34r7V
+
+* https://unix.stackexchange.com/
+
+* https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps
+
