@@ -48,3 +48,50 @@ Database
     created_datetime (DateTime)
     user_id (Integer, ForeignKey(refers to Item_user's id))
 
+
+IP Address of the host
+-----------------------
+
+
+13.234.69.5
+
+
+URL
+----
+
+
+http://www.shruthivs.com/
+
+
+Softwares Installed
+----------------------
+
+
+* postgresql
+* sqlalchemy
+* flask
+* random
+* httplib2
+* sessionmaker
+* oauth2client
+* random
+* requests
+
+
+Configurations
+-----------------
+
+
+* Using postgresql create database 'catalog'
+* Create user 'catalog', set password to 'catalog'
+* Update your initialization python script to access the database 'catalog'
+* Enable new virtual host  at /etc/apache2/sites-available/ and point it to access your wsgi file
+* Grant necessary permission and set up log files in the virtual host set up file
+* Create wsgi file in /var/www/FlaskApp directory and point it to your python app
+* Make sure you are running server on port 80
+* Create database schema by executing the 'itemCatalog_db.py'
+* restart apache server 
+* Access the website http://www.shruthivs.com/ and login using your google account
+* Execute lotsofitems.py to populate the database
+* Test the functionality of the app
+
